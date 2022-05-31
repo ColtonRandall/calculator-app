@@ -1,0 +1,28 @@
+/* Select everything */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(to right, teal, lightblue);
+}
+
+.calculator-grid {
+  display: grid;
+  margin-top: 2rem;
+  grid-template-columns: repeat(4, 6rem);
+  /* allows top row to grow as number gets bigger */
+  grid-template-rows: minmax(7rem, auto) repeat(5, 6rem);
+}
+
+.span-two {
+  grid-column: span 2;
+}
+
+.output {
+  /* we want to span entire row */
+  grid-column: 1/-1;
+}

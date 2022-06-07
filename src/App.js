@@ -150,6 +150,26 @@ function equals({ currentOperand, previousOperand, operation }) {
   return computation.toString();
 }
 
+// Format numbers to have commas for larger numbers
+const INTEGER_FORMATTER = new Intl.NumberFormat("en-us", {
+  maximumFractionDigits: 0,
+});
+
+function formatOperand(operand) {
+  // 1. If operand is zero, do nothing
+  if (operand == null) return;
+  // 2. Otherwise, get integer portion and decimal portion
+  // Take operand and split it ON the decimal
+  const [integer, decimal] = operand.split(".");
+  // 3. Then, if decimal is null, then we don't have a decimal
+  // Call formatter with interger portion
+  if (decimal == null) return INTEGER_FORMATTER.format(integer);
+  // 4. Account for decimal portion too
+  // Use string interpolation to format the integer BEFORE the decimal
+  // Then do NOT format the decimal, just render it as is
+  return `${INTEGER_FORMATTER.format(integer)}.${decimal}`;
+}
+
 function App() {
   // const [state, dispatch] = useReducer(reducer, initialArg, init);
 
@@ -162,9 +182,9 @@ function App() {
     <div className="calculator-grid">
       <div className="output">
         <div className="previous-operand">
-          {previousOperand} {operation}
+          {formatOperand(previousOperand)} {operation}
         </div>
-        <div className="current-operand">{currentOperand}</div>
+        <div className="current-operand">{formatOperand(currentOperand)}</div>
       </div>
       {/* Clear the current input */}
       <button

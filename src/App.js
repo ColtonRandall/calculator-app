@@ -70,15 +70,23 @@ function reducer(state, { type, payload }) {
         currentOperand: null,
       };
     case ACTIONS.EQUALS:
-        // 1. Check that we have all the information we need to perform a calculation
-        if(
-          state.operation == null || 
-          state.currentOperand == null || 
-          state.previousOperand == null
-        ){
-      return state
-    }
-    // 2. If we have everything we need, perform the calculation
+      // 1. Check that we have all the information we need to perform a calculation
+      if (
+        state.operation == null ||
+        state.currentOperand == null ||
+        state.previousOperand == null
+      ) {
+        return state;
+      }
+      // 2. If we have everything we need, perform the calculation
+      else
+        return {
+          ...state,
+          previousOperand: null, // We don't want anything to appear here
+          operation: null,
+          currentOperand: equals(state),
+        };
+  }
 }
 
 function equals({ currentOperand, previousOperand, operation }) {
@@ -97,7 +105,7 @@ function equals({ currentOperand, previousOperand, operation }) {
       // enter a break so it doesn't go into next case statement
       break;
     case "-":
-      computation = previous = current;
+      computation = previous - current;
       break;
     case "x":
       computation = previous * current;

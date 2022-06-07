@@ -17,6 +17,14 @@ export const ACTIONS = {
 function reducer(state, { type, payload }) {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
+      // Check if overwriting after an evaluation, first
+      if (state.overwrite) {
+        return {
+          ...state,
+          currentOperand: payload.digit, // replace operand with digit (after a calculation is done)
+          overwrite: false,
+        };
+      }
       // Make sure we can't add infinite zeros or periods -> a.k.a. don't make any changes
       if (payload.digit === "0" && state.currentOperand === "0") return state;
       if (payload.digit === "." && state.currentOperand.includes("."))
@@ -31,6 +39,31 @@ function reducer(state, { type, payload }) {
     case ACTIONS.CLEAR:
       // Return an empty state to clear the calculator
       return {};
+    case ACTIONS.DELETE_DIGIT:
+      // 1. Check if in overwrite state -> Clear everything
+      if (state.overwrite) {
+        return {
+          ...state,
+          overwrite: false,
+          currentOperand: null,
+        };
+      }
+      // 2. If there is nothing on the calculator, don't do anything
+      if (state.currentOperand == null) {
+        return state;
+      }
+      // 3. Check is the number is only one digit, then reset the entire number value
+      if (state.currentOperand.length === 1) {
+        return {
+          ...state,
+          currentOperand: null,
+        };
+      } else
+        return {
+          ...state,
+          // remove last digit from current operand
+          currentOperand: state.currentOperand.slice(0, -1),
+        };
     case ACTIONS.CHOOSE_OPERATION:
       // Return NOTHING if an operation is chosen FIRST, instead of a number
       if (state.currentOperand == null && state.previousOperand == null) {
@@ -82,6 +115,7 @@ function reducer(state, { type, payload }) {
       else
         return {
           ...state,
+          overwrite: true,
           previousOperand: null, // We don't want anything to appear here
           operation: null,
           currentOperand: equals(state),
@@ -139,7 +173,9 @@ function App() {
       >
         AC
       </button>
-      <button>⌫</button>
+      <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
+        ⌫
+      </button>
       <OperationButton operation="÷" dispatch={dispatch} />
       <DigitButton digit="1" dispatch={dispatch} />
       <DigitButton digit="2" dispatch={dispatch} />
